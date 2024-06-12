@@ -1,0 +1,3 @@
+[submodule "restaurant_protos"]
+	path = restaurant_protos
+	url = git@github.com:Mubinabd/restaurant_protos.git
