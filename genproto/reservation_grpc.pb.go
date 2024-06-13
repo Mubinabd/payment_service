@@ -25,6 +25,7 @@ const (
 	ReservationService_DeleteReservation_FullMethodName = "/restaurant_protos.ReservationService/DeleteReservation"
 	ReservationService_GetAllReservation_FullMethodName = "/restaurant_protos.ReservationService/GetAllReservation"
 	ReservationService_GetTotalSum_FullMethodName       = "/restaurant_protos.ReservationService/GetTotalSum"
+	ReservationService_CheckReservation_FullMethodName  = "/restaurant_protos.ReservationService/CheckReservation"
 )
 
 // ReservationServiceClient is the client API for ReservationService service.
@@ -37,6 +38,7 @@ type ReservationServiceClient interface {
 	DeleteReservation(ctx context.Context, in *ById, opts ...grpc.CallOption) (*Void, error)
 	GetAllReservation(ctx context.Context, in *FilterByTime, opts ...grpc.CallOption) (*Reservations, error)
 	GetTotalSum(ctx context.Context, in *ById, opts ...grpc.CallOption) (*Total, error)
+	CheckReservation(ctx context.Context, in *ResrvationTime, opts ...grpc.CallOption) (*Void, error)
 }
 
 type reservationServiceClient struct {
@@ -107,6 +109,16 @@ func (c *reservationServiceClient) GetTotalSum(ctx context.Context, in *ById, op
 	return out, nil
 }
 
+func (c *reservationServiceClient) CheckReservation(ctx context.Context, in *ResrvationTime, opts ...grpc.CallOption) (*Void, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Void)
+	err := c.cc.Invoke(ctx, ReservationService_CheckReservation_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ReservationServiceServer is the server API for ReservationService service.
 // All implementations must embed UnimplementedReservationServiceServer
 // for forward compatibility
@@ -117,6 +129,7 @@ type ReservationServiceServer interface {
 	DeleteReservation(context.Context, *ById) (*Void, error)
 	GetAllReservation(context.Context, *FilterByTime) (*Reservations, error)
 	GetTotalSum(context.Context, *ById) (*Total, error)
+	CheckReservation(context.Context, *ResrvationTime) (*Void, error)
 	mustEmbedUnimplementedReservationServiceServer()
 }
 
@@ -141,6 +154,9 @@ func (UnimplementedReservationServiceServer) GetAllReservation(context.Context, 
 }
 func (UnimplementedReservationServiceServer) GetTotalSum(context.Context, *ById) (*Total, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTotalSum not implemented")
+}
+func (UnimplementedReservationServiceServer) CheckReservation(context.Context, *ResrvationTime) (*Void, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckReservation not implemented")
 }
 func (UnimplementedReservationServiceServer) mustEmbedUnimplementedReservationServiceServer() {}
 
@@ -263,6 +279,24 @@ func _ReservationService_GetTotalSum_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ReservationService_CheckReservation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResrvationTime)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReservationServiceServer).CheckReservation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReservationService_CheckReservation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReservationServiceServer).CheckReservation(ctx, req.(*ResrvationTime))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ReservationService_ServiceDesc is the grpc.ServiceDesc for ReservationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -293,6 +327,10 @@ var ReservationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetTotalSum",
 			Handler:    _ReservationService_GetTotalSum_Handler,
+		},
+		{
+			MethodName: "CheckReservation",
+			Handler:    _ReservationService_CheckReservation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

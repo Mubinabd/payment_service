@@ -159,7 +159,7 @@ func (s *PaymentStorage) GetPayments(filter *pb.PaymentFilter) (*pb.Payments, er
 	var conditons []string
 	var args []interface{}
 	if filter.PaymentMethod != "" {
-		conditons = append(conditons, fmt.Sprintf("payment_method = $%d", len(args)+1))
+		conditons = append(conditons, fmt.Sprintf("payment_method ILIKE $%d", len(args)+1))
 		args = append(args, filter.PaymentMethod)
 	}
 	if filter.PaymentStatus != "" {
@@ -174,9 +174,11 @@ func (s *PaymentStorage) GetPayments(filter *pb.PaymentFilter) (*pb.Payments, er
 		conditons = append(conditons, fmt.Sprintf("amount <= $%d", len(args)+1))
 		args = append(args, filter.AmountTo)
 	}
+	fmt.Println(conditons,args)
 	if len(conditons) > 0 {
 		query += " WHERE " + strings.Join(conditons, " AND ")
 	}
+	fmt.Println(query)
 	rows, err := s.db.Query(query, args...)
 	if err!= nil {
         return nil, fmt.Errorf("failed to query payments: %w", err)
